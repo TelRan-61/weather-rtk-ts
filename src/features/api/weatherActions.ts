@@ -1,25 +1,20 @@
 import {api_key, base_url} from "../../utils/constants.ts";
-import {setWeather} from "../weather/weatherSlice.ts";
-import {setMessage} from "../message/messageSlice.ts";
-import type {AppDispatch} from "../../app/store.ts";
+import {createAsyncThunk} from "@reduxjs/toolkit";
 
-export const fetchWeather = (city: string) => {
-    return (dispatch: AppDispatch) => {
-        fetch(`${base_url}?q=${city}&appid=${api_key}&units=metric`)
-            .then(res => res.json())
-            .then(data => {
-                dispatch(setWeather({
-                    country: data.sys.country,
-                    city: data.name,
-                    temp: data.main.temp,
-                    pressure: data.main.pressure,
-                    sunset: (new Date(data.sys.sunset * 1000)).toLocaleTimeString()
-                }));
-                dispatch(setMessage(''));
-            })
-            .catch(e => {
-                console.log(e)
-                dispatch(setMessage('Enter correct city name'));
-            })
+export const fetchWeather = createAsyncThunk(
+    'fetch/weather',
+    async (city: string) => {
+        const response = await fetch(`${base_url}?q=${city}&appid=${api_key}&units=metric`)
+        if (!response.ok) {
+            throw new Error('Enter correct city name');
+        }
+        const data = await response.json();
+        return {
+            city: data.name,
+            country: data.sys.country,
+            temp: data.main.temp,
+            pressure: data.main.pressure,
+            sunset: (new Date(data.sys.sunset * 1000)).toLocaleTimeString()
+        }
     }
-}
+)
