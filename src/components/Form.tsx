@@ -8,7 +8,7 @@ const Form = () => {
     const getCity = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const city = e.currentTarget.city.value.trim();
-        dispatch(setCity(city));
+        dispatch(setCity(city.toLowerCase()));
     }
 
     return (
